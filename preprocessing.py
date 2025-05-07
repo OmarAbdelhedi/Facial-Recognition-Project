@@ -7,13 +7,13 @@ from PIL import Image
 from facenet_pytorch import MTCNN, InceptionResnetV1
 
 print(torch.cuda.get_device_name(0))  # This will print the name of the GPU if available
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-print(f'Using device: {device}')
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 # Initialize MTCNN for face detection
 mtcnn = MTCNN(image_size=160, margin=0, keep_all=False, device=device)
 # Initialize InceptionResnetV1 for face embeddings
-model = InceptionResnetV1(pretrained='vggface2').eval().to(device)
+model = InceptionResnetV1(pretrained="vggface2").eval().to(device)
 
 
 def detect_and_align_faces(image):
@@ -29,22 +29,26 @@ def detect_and_align_faces(image):
             areas = [(box[2] - box[0]) * (box[3] - box[1]) for box in boxes]
             largest_face_idx = np.argmax(areas)
             boxes = [boxes[largest_face_idx]]  # Keep only the largest face
-        
+
         for box in boxes:
             x1, y1, x2, y2 = map(int, box)
             face = image_rgb[y1:y2, x1:x2]
             faces.append(face)
     return faces
 
+
 def get_embedding(model, face_pixels):
     if not isinstance(face_pixels, np.ndarray):
         face_pixels = np.array(face_pixels)
     face_pixels = cv.resize(face_pixels, (160, 160))
-    face_pixels = torch.tensor(face_pixels).permute(2, 0, 1).unsqueeze(0).float().to(device)
+    face_pixels = (
+        torch.tensor(face_pixels).permute(2, 0, 1).unsqueeze(0).float().to(device)
+    )
     face_pixels = (face_pixels - 127.5) / 128
     with torch.no_grad():
         embedding = model(face_pixels)
     return embedding.squeeze().cpu().numpy()
+
 
 def load_embeddings(directory):
     embeddings = []
@@ -67,10 +71,13 @@ def load_embeddings(directory):
                         except:
                             continue
     return embeddings, labels
-#takes around 12 minutes to load 15,072  pictures and returns 13,610 embedding
-embeddings, labels = load_embeddings(r"C:\Users\abdel\OneDrive\Bureau\test\train_img - Copy")
+
+
+# takes around 12 minutes to load 15,072  pictures and returns 13,610 embedding
+embeddings, labels = load_embeddings("train_img - Copy")
 import pickle
-with open('face_embeddings.pkl', 'wb') as f:
+
+with open("face_embeddings.pkl", "wb") as f:
     pickle.dump((embeddings, labels), f)
 
 print("Embeddings and labels saved to face_embeddings.pkl")

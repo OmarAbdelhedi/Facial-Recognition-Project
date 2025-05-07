@@ -1,3 +1,6 @@
+# this code is used to connect the front end to the back end
+# not completed yet
+
 from flask import Flask, request, jsonify
 import cv2
 import numpy as np
