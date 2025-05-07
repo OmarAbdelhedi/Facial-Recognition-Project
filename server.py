@@ -16,7 +16,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Load the embeddings and identities from the pickle file
-embeddings_file = r"C:\Users\abdel\OneDrive\Bureau\test\embeddings_from_csv.pkl"
+embeddings_file = "face_embeddings.pkl"
 with open(embeddings_file, "rb") as f:
     embeddings, identities = pickle.load(f)
 
